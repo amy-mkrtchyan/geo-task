@@ -1,15 +1,11 @@
-source :rubygems
+source 'https://rubygems.org'
 
 gem 'sinatra'
 
-# Collection of useful Sinatra extensions
 gem 'sinatra-contrib'
 
-# ODM (Object Document Mapper) Framework for MongoDB.
-gem 'mongoid'
+gem 'mongoid-geospatial'
 
-#Rack middleware that provides authentication for rack applications.
-gem 'warden'
+gem 'bcrypt', '~> 3.1.11'
 
-# Hash algorithm for hashing passwords.
-gem 'bcrypt-ruby'
+gem 'rack-contrib', '1.4.0'
