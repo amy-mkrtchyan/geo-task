@@ -6,3 +6,4 @@ require 'rack/mock'
 require 'rack/contrib'
 require 'sinatra'
 require 'mongoid/geospatial'
+

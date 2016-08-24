@@ -1,12 +1,12 @@
 class GeoTask < Sinatra::Base
 
   post '/login' do
-    user = User.where(login: user_params[:login]).first
+    user = User.find_by(login: user_params[:login])
     if user.try(:authenticate, user_params[:password])
       user.generate_token!
       {token: user.token}.to_json
     else
-      error(401, 'Unauthorized!')
+      http_error 401
     end
   end
 
@@ -16,12 +16,12 @@ class GeoTask < Sinatra::Base
   end
 
   get '/users/:user_id/tasks' do |uid|
-    user = User.where(login: uid).first
+    user = User.find_by(login: uid)
     user.serialize
   end
 
   get '/users/:user_id/tasks/:task_id' do |uid, tid|
-    user = User.where(login: uid).first
+    user = User.find_by(login: uid)
     user.tasks.find(ObjectId(tid)).serialize
   end
 

@@ -4,6 +4,23 @@ class GeoTask < Sinatra::Base
 
   Mongoid.load!('config/mongoid.yml', :development)
 
+  set :show_exceptions, :after_handler
+  set(:auth) do |*roles|
+    condition { http_error 401 unless @current_user.among?(roles) } unless roles.empty?
+  end
+
+  error Mongoid::Errors::DocumentNotFound do |*args|
+    http_error 404
+  end
+
+  error Mongoid::Errors::Validations do |err|
+    http_error(403, {errors: err.document.errors}.to_json)
+  end
+
+  def http_error(code, body = HTTP_STATUS_CODES[code])
+    halt error(code, body)
+  end
+
   before do
     begin
       content_type :json
@@ -17,15 +34,12 @@ class GeoTask < Sinatra::Base
     end
   end
 
-  require_relative 'mvc_components'
+  require_relative 'models.inc'
+  require_relative 'routes.inc'
+
 
   before /^(?!\/(login|signup))/ do
-    @current_user = User.where(token: env['HTTP_ACCESS_TOKEN']).first if env['HTTP_ACCESS_TOKEN']
-    error(403, 'Access denied!') unless @current_user
+    @current_user = User.find_by(token: env['HTTP_ACCESS_TOKEN']) rescue http_error(401)
   end
 
-  set(:method) do |method|
-    method = method.to_s.upcase
-    condition { request.request_method == method }
-  end
 end
