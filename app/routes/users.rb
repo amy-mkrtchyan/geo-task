@@ -1,5 +1,9 @@
 class GeoTask < Sinatra::Base
 
+  before '/users/:user_id/*' do
+    @user = User.find_by(login: params[:user_id]) if params[:user_id]
+  end
+
   post '/login' do
     user = User.find_by(login: user_params[:login])
     if user.try(:authenticate, user_params[:password])
@@ -12,17 +16,19 @@ class GeoTask < Sinatra::Base
 
   post '/signup' do
     user = User.create!(user_params)
-    user.serialize
+    UserSerializer.new(user).to_json
   end
 
-  get '/users/:user_id/tasks' do |uid|
-    user = User.find_by(login: uid)
-    user.serialize
+  get '/users/:user_id/tasks' do
+    TaskSerializer.new(@user.tasks).to_json
   end
 
-  get '/users/:user_id/tasks/:task_id' do |uid, tid|
-    user = User.find_by(login: uid)
-    user.tasks.find(ObjectId(tid)).serialize
+  get '/users/:user_id/tasks/active' do
+    TaskSerializer.new(@user.tasks.assigned).to_json
+  end
+
+  get '/users/:user_id/tasks/delivered' do
+    TaskSerializer.new(@user.tasks.done).to_json
   end
 
 private

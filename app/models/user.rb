@@ -8,8 +8,6 @@ class User
       DRIVER: 1
   }
 
-  SHOWABLE_FIELDS = %i{name type location}
-
   has_secure_password
 
   field :name, type: String
@@ -28,11 +26,7 @@ class User
 
   def among?(*types)
     types.flatten!
-    types.include?(TYPE.key(type).downcase)
-  end
-
-  def serialize
-    to_json({include: :tasks, only: SHOWABLE_FIELDS})
+    types.include?(self.name.downcase.to_sym)
   end
 end
 
@@ -46,7 +40,11 @@ end
 
 
 class Driver < User
-  field :location, type: Point, spatial: true, delegate: true
+  field :location, type: Point, spatial: true, delegate: {x: :x, y: :y}
   has_many :tasks, inverse_of: :driver
   default_scope ->{ where(type: User::TYPE[:DRIVER]) }
+
+  def busy?
+    tasks.any? {|t| t.state == Task::STATE_ASSIGNED }
+  end
 end
