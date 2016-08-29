@@ -54,5 +54,4 @@ class Task
     update!(state: STATE_DONE)
     driver.update!(location: delivery)
   end
-
 end

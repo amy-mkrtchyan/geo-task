@@ -20,6 +20,7 @@ class GeoTask < Sinatra::Base
   def http_error(code, body = HTTP_STATUS_CODES[code])
     halt error(code, body)
   end
+  alias :http_response :http_error
 
   before do
     begin
@@ -38,7 +39,7 @@ class GeoTask < Sinatra::Base
   require_relative 'routes.inc'
 
 
-  before /^(?!\/(login|signup))/ do
+  before %r{^(?!/(login|signup))} do
     @current_user = User.find_by!(token: env['HTTP_ACCESS_TOKEN']) rescue http_error(401)
   end
 

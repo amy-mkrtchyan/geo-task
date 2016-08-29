@@ -44,7 +44,17 @@ class Driver < User
   has_many :tasks, inverse_of: :driver
   default_scope ->{ where(type: User::TYPE[:DRIVER]) }
 
+  validate :driver_location
+
   def busy?
     tasks.any? {|t| t.state == Task::STATE_ASSIGNED }
   end
+
+private
+
+  def driver_location
+    errors.add(:location, 'is invalid!') unless x && y && x.is_a?(Numeric) && y.is_a?(Numeric)
+  end
+
+
 end
