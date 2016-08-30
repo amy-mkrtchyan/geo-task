@@ -21,7 +21,6 @@ class User
 
   def generate_token!
     update_attribute(:token, SecureRandom.urlsafe_base64(64))
-    @current
   end
 
   def among?(*types)
@@ -55,6 +54,4 @@ private
   def driver_location
     errors.add(:location, 'is invalid!') unless x && y && x.is_a?(Numeric) && y.is_a?(Numeric)
   end
-
-
 end
